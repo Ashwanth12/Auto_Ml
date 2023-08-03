@@ -8,6 +8,10 @@ import numpy as np
 from scikitplot import metrics
 from scipy.stats import zscore
 import io
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+
+from sklearn.decomposition import PCA, TruncatedSVD
+from sklearn.manifold import TSNE, MDS, Isomap
 from sklearn.metrics import mean_absolute_error, mean_squared_error, precision_score, recall_score, f1_score
 from sklearn.cluster import AffinityPropagation, AgglomerativeClustering, Birch, DBSCAN, KMeans, MiniBatchKMeans, \
     MeanShift, OPTICS, SpectralClustering
@@ -706,3 +710,50 @@ if choice == "Modelling":
                     table["Accuracy"].append(metrics.silhouette_score(x_train, labels))
             st.write(pd.DataFrame(table))
             st.snow()
+
+    if choice1 == "Dimensionality Reduction ":
+        scaler = StandardScaler()
+        X_train_std = scaler.fit_transform(x_train)
+        X_test_std = scaler.transform(x_test)
+
+        algorithms = st.multiselect("Dimensionality Reduction",
+                                    ["PCA", "LDA", "FA", "Truncated SVD", "Kemal PCA", "t-SNE", "MDS", "Isomap"])
+
+        if st.button('Run Modelling'):
+            for algorithm in algorithms:
+                if algorithm == "PCA":
+                    pca = PCA(n_components=2)
+                    data_pca = pca.fit_transform(X_train_std)
+                    st.write("PCA Results:")
+                    st.write(pd.DataFrame(data_pca, columns=['Component 1', 'Component 2']))
+
+                elif algorithm == "LDA":
+                    lda = LDA(n_components=2)
+                    data_lda = lda.fit_transform(X_train_std, y_train)
+                    st.write("LDA Results:")
+                    st.write(pd.DataFrame(data_lda, columns=['Component 1', 'Component 2']))
+
+                elif algorithm == "Truncated SVD":
+                    svd = TruncatedSVD(n_components=2)
+                    data_svd = svd.fit_transform(X_train_std)
+                    st.write("Truncated SVD Results:")
+                    st.write(pd.DataFrame(data_svd, columns=['Component 1', 'Component 2']))
+
+                elif algorithm == "t-SNE":
+                    tsne = TSNE(n_components=2, random_state=42)
+                    data_tsne = tsne.fit_transform(X_train_std)
+                    st.write("t-SNE Results:")
+                    st.write(pd.DataFrame(data_tsne, columns=['Component 1', 'Component 2']))
+
+                elif algorithm == "MDS":
+                    mds = MDS(n_components=2, random_state=42)
+                    data_mds = mds.fit_transform(X_train_std)
+                    st.write("MDS Results:")
+                    st.write(pd.DataFrame(data_mds, columns=['Component 1', 'Component 2']))
+
+                elif algorithm == "Isomap":
+                    isomap = Isomap(n_components=2, n_neighbors=5)
+                    data_isomap = isomap.fit_transform(X_train_std)
+                    st.write("Isomap Results:")
+                    st.write(pd.DataFrame(data_isomap, columns=['Component 1', 'Component 2']))
+
