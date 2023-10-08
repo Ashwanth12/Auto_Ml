@@ -56,7 +56,7 @@ if choice == "Introduction":
     ### *Upload:*
     In this section, you can effortlessly upload your dataset and explore its contents. Once your data is uploaded, our platform provides a detailed description of the dataset, highlighting key statistics, such as the number of rows, columns, and unique values. You can quickly identify potential data quality issues by checking for the presence of duplicate records and missing values in each column.
     """)
-    st.image(Image.open("C:/Users/Ashwanth Narlapally/Pictures/Screenshots/Screenshot 2023-10-03 172638.png"))
+    st.image(Image.open("images/upload.png"))
     st.markdown("""
     ### *Cleaning:*
     The cleaning section empowers you to enhance the quality of your data effortlessly. If there are any unnecessary columns in your dataset, you can easily remove them to focus on the relevant information. Additionally, you have the option to remove duplicates and handle missing values intelligently. Our platform will assist you in maintaining a clean and accurate dataset for further analysis.""")
@@ -64,39 +64,39 @@ if choice == "Introduction":
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.image(Image.open("C:/Users/Ashwanth Narlapally/Pictures/Screenshots/Screenshot 2023-10-03 143502.png"))
+        st.image(Image.open("images/Cleaning1.png"))
 
     with col2:
-        st.image(Image.open("C:/Users/Ashwanth Narlapally/Pictures/Screenshots/Screenshot 2023-10-03 143531.png"))
+        st.image(Image.open("images/Cleaning2.png"))
 
     with col3:
-        st.image(Image.open("C:/Users/Ashwanth Narlapally/Pictures/Screenshots/Screenshot 2023-10-03 143545.png"))
+        st.image(Image.open("images/Cleaning3.png"))
     st.markdown("""
     ### *Profiling:*
     Our profiling feature leverages the power of pandas profiling to provide you with a comprehensive overview of your dataset. You will gain insights into data types, descriptive statistics, and correlations between variables. With this detailed meta-information, you can better understand the underlying patterns and relationships within your data.""")
-    st.image(Image.open("C:/Users/Ashwanth Narlapally/Pictures/Screenshots/Screenshot 2023-10-03 144426.png"))
+    st.image(Image.open("images/profiling.png"))
     st.markdown("""
     ### *Data Visualization:*
     Data visualization is key to uncovering hidden patterns and presenting insights effectively. In this section, we offer a rich set of visualizations, akin to the capabilities of popular tools like Tableau. Our interactive charts and plots will help you create compelling visuals to showcase your data's story, making it easier for your audience to grasp complex information at a glance.""")
-    st.image(Image.open("C:/Users/Ashwanth Narlapally/Pictures/Screenshots/Screenshot 2023-10-03 145312.png"))
+    st.image(Image.open("images/pivot.png"))
     st.markdown("""
     ### *Modelling:*
     For the data scientists and machine learning enthusiasts, the modeling section is a treasure trove of possibilities. Begin by selecting the target variable and specifying the problem type - be it regression, classification, clustering, or dimensionality reduction. Then, fine-tune the hyperparameters of various algorithms to obtain the best results. Once the models are trained, our platform will present a detailed performance summary, including essential metrics such as MAE, RMSE, R2 score, precision, recall, and F1 score. You'll be empowered to make data-driven decisions with confidence.""")
     col4, col5, col6 = st.columns(3)
 
     with col4:
-        st.image(Image.open("C:/Users/Ashwanth Narlapally/Pictures/Screenshots/Screenshot 2023-10-03 145803.png"))
+        st.image(Image.open("images/model1.png"))
 
     with col5:
-        st.image(Image.open("C:/Users/Ashwanth Narlapally/Pictures/Screenshots/Screenshot 2023-10-03 145814.png"))
+        st.image(Image.open("images/model2.png"))
 
     with col6:
-        st.image(Image.open("C:/Users/Ashwanth Narlapally/Pictures/Screenshots/Screenshot 2023-10-03 145825.png"))
+        st.image(Image.open("images/model3.png"))
 
     st.markdown("""
     ### *Download:*
     At the end of your journey, you can seamlessly download your model in the form of convenient pickle files, enabling you to deploy your trained model easily. Additionally, if you need a copy of your processed dataset, you can download it in the universally-accepted CSV format, ensuring your data remains accessible for further analysis or sharing.""")
-    st.image(Image.open("C:/Users/Ashwanth Narlapally/Pictures/Screenshots/Screenshot 2023-10-05 192956.png"))
+    st.image(Image.open("images/download.png"))
     st.markdown("""
     Join us in exploring the power of data analysis and machine learning! Our platform is your gateway to uncovering hidden insights, making data-driven decisions, and bringing your projects to new heights. Let's embark on this exciting journey together!""")
 
@@ -308,6 +308,13 @@ if choice == "Modelling":
             x_test_encoded = ct_encoder.transform(x_test)
             x_train = scaler.fit_transform(x_train_encoded)
             x_test = scaler.transform(x_test_encoded)
+            label = {}
+            v = 0
+            for i in y.unique():
+                label[i] = v
+                v += 1
+            y_test = y_test.apply(lambda x: label[x])
+            y_train = y_train.apply(lambda x: label[x])
             # st.dataframe(x_train)
             # st.dataframe(x_test)
             # st.dataframe(y_train)
@@ -554,7 +561,7 @@ if choice == "Modelling":
 
                         elif algorithm == "Support Vector Machines (SVM)":
 
-                            reg = SVC()
+                            reg = SVC(decision_function_shape='ovo')
                             reg.fit(x_train, y_train)
                             y_pred = reg.predict(x_test)
                             accuracy = accuracy_score(y_test, y_pred) * 100
@@ -642,20 +649,6 @@ if choice == "Modelling":
                             table["Recall"].append(recall)
                             table["F1-Score"].append(f1)
                             pickle.dump(reg, open('GP.pkl', 'wb'))
-
-                        # elif algorithm == "DecisionTreeClassifier":
-                        #     reg = DecisionTreeClassifier()
-                        #     reg.fit(x_train, y_train)
-                        #     y_pred = reg.predict(x_test)
-                        #     accuracy = accuracy_score(y_test, y_pred) * 100
-                        #     precision = precision_score(y_test, y_pred, average='weighted') * 100
-                        #     recall = recall_score(y_test, y_pred, average='weighted') * 100
-                        #     f1 = f1_score(y_test, y_pred, average='weighted') * 100
-                        #
-                        #     table["Algorithm"].append("DecisionTreeClassifier")
-                        #     table["Precision"].append(precision)
-                        #     table["Recall"].append(recall)
-                        #     table["F1-Score"].append(f1)
 
                         elif algorithm == "Perceptron":
                             reg = Perceptron()
