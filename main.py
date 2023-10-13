@@ -1,13 +1,14 @@
 import os
 import pickle
-
+# from streamlit_lottie import st_lottie
+# import pygwalker as pyg
 import streamlit as st
 import pandas as pd
 from pandas_profiling import ProfileReport
 import streamlit.components.v1 as components
 from pivottablejs import pivot_ui
 import numpy as np
-from safetensors.torch import save_model
+# from safetensors.torch import save_model
 from scikitplot import metrics
 from scipy.stats import zscore
 import io
@@ -243,6 +244,7 @@ if choice == "Cleaning":
                     elif option == "Capping":
                         df[column] = np.where(df[column] < lower_limit, lower_limit, df[column])
                         df[column] = np.where(df[column] > upper_limit, upper_limit, df[column])
+
                 st.write(df)
         df.to_csv("data.csv")
 
@@ -250,7 +252,7 @@ if choice == "Data visualization":
     if os.path.exists('./data.csv'):
         df = pd.read_csv("./data.csv")
         df = df.iloc[:, 1:]
-        st.title("Pivot Table")
+        st.title("Data visualization")
         t = pivot_ui(df)
         with open(t.src) as t:
             components.html(t.read(), width=900, height=1000, scrolling=True)
@@ -281,6 +283,7 @@ if choice == "Profiling":
             st.subheader("GO To Upload File")
 
 if choice == "Modelling":
+    df_results = []
     if not os.path.exists('./data.csv'):
         st.subheader("Go To Upload File")
         # df = pd.read_csv('dataset.csv', index_col=None)
@@ -288,7 +291,6 @@ if choice == "Modelling":
         df = pd.read_csv("./data.csv")
         df = df.iloc[:, 1:]
         df_clone = df.iloc[:, 1:]
-        # st.dataframe(df)
         col1, col2 = st.columns(2, gap='medium')
         with col1:
             st.subheader("supervised machine learning")
@@ -308,17 +310,7 @@ if choice == "Modelling":
             x_test_encoded = ct_encoder.transform(x_test)
             x_train = scaler.fit_transform(x_train_encoded)
             x_test = scaler.transform(x_test_encoded)
-            label = {}
-            v = 0
-            for i in y.unique():
-                label[i] = v
-                v += 1
-            y_test = y_test.apply(lambda x: label[x])
-            y_train = y_train.apply(lambda x: label[x])
-            # st.dataframe(x_train)
-            # st.dataframe(x_test)
-            # st.dataframe(y_train)
-            # st.dataframe(y_test)
+
             if "Regression" in choice1:
                 algorithms = st.multiselect("Regression Algorithms",
                                             ["Linear Regression", "Polynomial Regression",
@@ -480,10 +472,15 @@ if choice == "Modelling":
                             table["R2 Score"].append(r2score)
                             pickle.dump(reg, open('ABR.pkl', 'wb'))
                     df_results = pd.DataFrame(table)
-                    st.write(df_results)
-                    st.snow()
 
             elif "Classification" in choice1:
+                label = {}
+                v = 0
+                for i in y.unique():
+                    label[i] = v
+                    v += 1
+                y_test = y_test.apply(lambda x: label[x])
+                y_train = y_train.apply(lambda x: label[x])
                 algorithms = st.multiselect("Classification Algorithms", ["Logistic Regression", "Decision Trees",
                                                                           "Random Forest", "Naive Bayes",
                                                                           "Support Vector Machines (SVM)",
@@ -494,7 +491,7 @@ if choice == "Modelling":
                                                                           "Perceptron", "KNN Classifier",
                                                                           "Ridge Classifier",
                                                                           "Passive Aggressive Classifier",
-                                                                          "Elastic Net", "Lasso Regression", ])
+                                                                          "Elastic Net", "Lasso Regression"])
 
                 if st.button('Run Modelling'):
                     table = {"Algorithm": [], "Precision": [], "Recall": [], "F1-Score": []}
@@ -666,7 +663,7 @@ if choice == "Modelling":
                             pickle.dump(reg, open('PT.pkl', 'wb'))
 
                         elif algorithm == "KNN Classifier":
-                            k_neighbors = st.slider("Number of Neighbors (K) for KNN", 1, 20,5)
+                            k_neighbors = st.slider("Number of Neighbors for KNN", 1, 20, 5)
                             reg = KNeighborsClassifier(n_neighbors=k_neighbors)
                             reg.fit(x_train, y_train)
                             y_pred = reg.predict(x_test)
@@ -773,18 +770,15 @@ if choice == "Modelling":
                             table["F1-Score"].append(f1)
                             pickle.dump(reg, open('LAR.pkl', 'wb'))
                     df_results = pd.DataFrame(table)
-                    st.write(df_results)
-                    st.snow()
+
         with col2:
             st.subheader("Unsupervised machine learning")
             numerical_col = df.select_dtypes(include=np.number).columns
             categorical_col = df.select_dtypes(exclude=np.number).columns
-            choice1 = st.selectbox("Unsupervised", ["Clustering", "Dimensionality Reduction"])
-            scaler = StandardScaler()
             ct_encoder = ColumnTransformer(transformers=[('encoder', OneHotEncoder(), categorical_col)],
                                            remainder='passthrough')
             df = ct_encoder.fit_transform(df)
-            df = scaler.fit_transform(df)
+            choice1 = st.selectbox("Unsupervised", ["Clustering", "Dimensionality Reduction"])
             if "Clustering" in choice1:
 
                 algorithms = st.multiselect("Clustering Algorithms",
@@ -794,7 +788,7 @@ if choice == "Modelling":
                                              "Gaussian Mixture Model"])
 
                 if st.button('Run Model'):
-                    table = {"Algorithm": [], "Accuracy": []}
+                    table = {"Algorithm": [], "Silhouette": []}
                     for algorithm in algorithms:
                         if algorithm == "Affinity Propagation":
                             clustering = AffinityPropagation()
@@ -802,8 +796,8 @@ if choice == "Modelling":
                             labels = clustering.labels_
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
-                            table["Accuracy"].append(silhouette_score)
-                            pickle.dump(reg, open('AP.pkl', 'wb'))
+                            table["Silhouette"].append(silhouette_score)
+                            pickle.dump(clustering, open('AP.pkl', 'wb'))
 
                         elif algorithm == "Agglomerative Clustering":
                             clustering = AgglomerativeClustering()
@@ -811,8 +805,8 @@ if choice == "Modelling":
                             labels = clustering.labels_
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
-                            table["Accuracy"].append(silhouette_score)
-                            pickle.dump(reg, open('AC.pkl', 'wb'))
+                            table["Silhouette"].append(silhouette_score)
+                            pickle.dump(clustering, open('AC.pkl', 'wb'))
 
                         elif algorithm == "BIRCH":
                             clustering = Birch()
@@ -820,16 +814,16 @@ if choice == "Modelling":
                             labels = clustering.labels_
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
-                            table["Accuracy"].append(silhouette_score)
-                            pickle.dump(reg, open('BC.pkl', 'wb'))
+                            table["Silhouette"].append(silhouette_score)
+                            pickle.dump(clustering, open('BC.pkl', 'wb'))
 
                         elif algorithm == "DBSCAN":
                             clustering = DBSCAN()
                             labels = clustering.fit_predict(df)
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
-                            table["Accuracy"].append(silhouette_score)
-                            pickle.dump(reg, open('DB.pkl', 'wb'))
+                            table["Silhouette"].append(silhouette_score)
+                            pickle.dump(clustering, open('DB.pkl', 'wb'))
 
                         elif algorithm == "K-Means":
                             clustering = KMeans()
@@ -837,8 +831,8 @@ if choice == "Modelling":
                             labels = clustering.predict(df)
                             silhouette_avg = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append("K-Means")
-                            table["Accuracy"].append(silhouette_score)
-                            pickle.dump(reg, open('KM.pkl', 'wb'))
+                            table["Silhouette"].append(silhouette_avg)
+                            pickle.dump(clustering, open('KM.pkl', 'wb'))
 
                         elif algorithm == "Mini-Batch K-Means":
                             clustering = MiniBatchKMeans()
@@ -846,16 +840,16 @@ if choice == "Modelling":
                             labels = clustering.labels_
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
-                            table["Accuracy"].append(silhouette_score)
-                            pickle.dump(reg, open('MBK.pkl', 'wb'))
+                            table["Silhouette"].append(silhouette_score)
+                            pickle.dump(clustering, open('MBK.pkl', 'wb'))
 
                         elif algorithm == "Mean Shift":
                             clustering = MeanShift()
                             labels = clustering.fit_predict(df)
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
-                            table["Accuracy"].append(silhouette_score)
-                            pickle.dump(reg, open('MS.pkl', 'wb'))
+                            table["Silhouette"].append(silhouette_score)
+                            pickle.dump(clustering, open('MS.pkl', 'wb'))
 
                         elif algorithm == "OPTICS":
                             clustering = OPTICS()
@@ -863,8 +857,8 @@ if choice == "Modelling":
                             labels = clustering.labels_
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
-                            table["Accuracy"].append(silhouette_score)
-                            pickle.dump(reg, open('OC.pkl', 'wb'))
+                            table["Silhouette"].append(silhouette_score)
+                            pickle.dump(clustering, open('OC.pkl', 'wb'))
 
                         elif algorithm == "Spectral Clustering":
                             clustering = SpectralClustering()
@@ -872,81 +866,76 @@ if choice == "Modelling":
                             labels = clustering.labels_
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
-                            table["Accuracy"].append(silhouette_score)
-                            pickle.dump(reg, open('SC.pkl', 'wb'))
+                            table["Silhouette"].append(silhouette_score)
+                            pickle.dump(clustering, open('SC.pkl', 'wb'))
 
                         elif algorithm == "Gaussian Mixture Model":
                             clustering = GaussianMixture(n_components=10)
                             labels = clustering.fit_predict(df)
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
-                            table["Accuracy"].append(silhouette_score)
-                            pickle.dump(reg, open('GMM.pkl', 'wb'))
-                    st.write(pd.DataFrame(table))
-                    st.snow()
+                            table["Silhouette"].append(silhouette_score)
+                            pickle.dump(clustering, open('GMM.pkl', 'wb'))
+                    df_results = pd.DataFrame(table)
 
             elif "Dimensionality Reduction" in choice1:
-                algorithms = st.multiselect("Dimensionality Reduction",
-                                            ["PCA", "LDA", "Truncated SVD", "t-SNE", "MDS", "Isomap"])
+                algorithms = st.selectbox("Dimensionality Reduction",
+                                          ["PCA", "LDA", "Truncated SVD", "t-SNE", "MDS", "Isomap"])
                 nc = st.slider("n_components", 1, df_clone.shape[1])
                 if st.button('Run Model'):
-                    for algorithm in algorithms:
-                        if algorithm == "PCA":
-                            pca = PCA(n_components=nc)
-                            data_pca = pca.fit_transform(df)
-                            st.write("PCA Results:")
-                            st.write(pd.DataFrame(data_pca))
 
+                    if algorithms == "PCA":
+                        pca = PCA(n_components=nc)
+                        data_pca = pca.fit_transform(df)
+                        st.write("PCA Results:")
+                        df_results = pd.DataFrame(data_pca)
 
-                        elif algorithm == "LDA":
-                            lda = LDA(n_components=nc)
-                            chosen_target = st.selectbox('Choose the Target Column', df_clone.columns)
-                            X = df_clone.drop(columns=[chosen_target])
-                            y = df_clone[chosen_target]
-                            X = ct_encoder.fit_transform(X)
-                            y = ct_encoder.fit_transform(y)
-                            X = scaler.fit_transform(X)
-                            y = scaler.fit_transform(y)
+                    elif algorithms == "LDA":
+                        lda = LDA(n_components=nc)
+                        chosen_target = st.selectbox('Choose the Target Column', df_clone.columns)
+                        X = df_clone.drop(columns=[chosen_target])
+                        y = df_clone[chosen_target]
+                        X = ct_encoder.fit_transform(X)
+                        y = ct_encoder.fit_transform(y)
+                        X = scaler.fit_transform(X)
+                        y = scaler.fit_transform(y)
 
-                            data_lda = lda.fit_transform(X, y)
-                            st.write("LDA Results:")
-                            st.write(pd.DataFrame(data_lda))
+                        data_lda = lda.fit_transform(X, y)
+                        st.write("LDA Results:")
+                        df_results = pd.DataFrame(data_lda)
 
+                    elif algorithms == "Truncated SVD":
+                        svd = TruncatedSVD(n_components=nc)
+                        data_svd = svd.fit_transform(df)
+                        st.write("Truncated SVD Results:")
+                        df_results = pd.DataFrame(data_svd)
 
-                        elif algorithm == "Truncated SVD":
-                            svd = TruncatedSVD(n_components=nc)
-                            data_svd = svd.fit_transform(df)
-                            st.write("Truncated SVD Results:")
-                            st.write(pd.DataFrame(data_svd))
+                    elif algorithms == "t-SNE":
+                        tsne = TSNE(n_components=nc, random_state=42)
+                        data_tsne = tsne.fit_transform(df)
+                        st.write("t-SNE Results:")
+                        df_results = pd.DataFrame(data_tsne)
 
+                    elif algorithms == "MDS":
+                        mds = MDS(n_components=nc, random_state=42)
+                        data_mds = mds.fit_transform(df)
+                        st.write("MDS Results:")
+                        df_results = pd.DataFrame(data_mds)
 
-                        elif algorithm == "t-SNE":
-                            tsne = TSNE(n_components=nc, random_state=42)
-                            data_tsne = tsne.fit_transform(df)
-                            st.write("t-SNE Results:")
-                            st.write(pd.DataFrame(data_tsne))
+                    elif algorithms == "Isomap":
+                        isomap = Isomap(n_components=nc, n_neighbors=5)
+                        data_isomap = isomap.fit_transform(df)
+                        st.write("Isomap Results:")
+                        df_results = pd.DataFrame(data_isomap)
 
-
-                        elif algorithm == "MDS":
-                            mds = MDS(n_components=nc, random_state=42)
-                            data_mds = mds.fit_transform(df)
-                            st.write("MDS Results:")
-                            st.write(pd.DataFrame(data_mds))
-
-
-                        elif algorithm == "Isomap":
-                            isomap = Isomap(n_components=nc, n_neighbors=5)
-                            data_isomap = isomap.fit_transform(df)
-                            st.write("Isomap Results:")
-                            st.write(pd.DataFrame(data_isomap))
-
-                    st.snow()
+        st.write(df_results)
+        st.snow()
 
 if choice == "Download":
     if not os.path.exists('./data.csv'):
         st.subheader("Go To Upload File")
     else:
-        df = df.iloc[:, 1:]
+        df = df.iloc[:,:]
         st.dataframe(df.head(10))
         df.to_csv(r"DATA.csv")
         with open('DATA.csv', 'rb') as file:
