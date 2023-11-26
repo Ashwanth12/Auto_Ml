@@ -1,14 +1,11 @@
 import os
 import pickle
-# from streamlit_lottie import st_lottie
-# import pygwalker as pyg
 import streamlit as st
 import pandas as pd
-from pandas_profiling import ProfileReport
+from ydata_profiling import ProfileReport
 import streamlit.components.v1 as components
 from pivottablejs import pivot_ui
 import numpy as np
-# from safetensors.torch import save_model
 from scikitplot import metrics
 from scipy.stats import zscore
 import io
@@ -286,7 +283,6 @@ if choice == "Modelling":
     df_results = []
     if not os.path.exists('./data.csv'):
         st.subheader("Go To Upload File")
-        # df = pd.read_csv('dataset.csv', index_col=None)
     else:
         df = pd.read_csv("./data.csv")
         df = df.iloc[:, 1:]
@@ -936,7 +932,7 @@ if choice == "Download":
         st.subheader("Go To Upload File")
     else:
         df = df.iloc[:,:]
-        st.dataframe(df.head(10))
+        # st.dataframe(df.head(10))
         df.to_csv(r"DATA.csv")
         with open('DATA.csv', 'rb') as file:
             data = file.read()
