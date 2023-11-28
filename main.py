@@ -103,7 +103,7 @@ if choice == "Upload":
     components.html("""
 <script async <!-- Global site tag (gtag.js) Google Analytics -->
 src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5056338602918094" crossorigin="anonymous"></script>
-<\script>
+<script>
 window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());""")
     st.title("Upload Your Dataset")
