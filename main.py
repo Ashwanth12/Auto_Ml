@@ -493,9 +493,13 @@ if choice == "Modelling":
                 st.session_state['classes'] = classes
                 y_test = y_test.apply(lambda x: label[x])
                 y_train = y_train.apply(lambda x: label[x])
-                algorithms = st.multiselect("Classification Algorithms", ["Logistic Regression", "Decision Trees",
-                                                                          "Elastic Net", "Lasso Regression"])
 
+                algorithms = st.multiselect(
+                    "Classification Algorithms", ["Logistic Regression", "Decision Trees", "Random Forest", "Naive Bayes",
+                                                   "Support Vector Machines (SVM)", "Gradient Boosting", "Neural Networks",
+                                                   "Quadratic Discriminant Analysis (QDA)", "Adaptive Boosting (AdaBoost)",
+                                                   "Gaussian Processes", "Perceptron", "KNN Classifier", "Ridge Classifier",
+                                                   "Passive Aggressive Classifier", "Elastic Net", "Lasso Regression"])
                 if True:
                     snow = True
                     table = {"Algorithm": [], "Precision": [], "Recall": [], "F1-Score": []}
