@@ -100,12 +100,12 @@ if choice == "Introduction":
     st.markdown("""
     Join us in exploring the power of data analysis and machine learning! Our platform is your gateway to uncovering hidden insights, making data-driven decisions, and bringing your projects to new heights. Let's embark on this exciting journey together!""")
 if choice == "Upload":
-components.html("""
+    components.html("""
 <script async <!-- Global site tag (gtag.js) Google Analytics -->
 src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5056338602918094" crossorigin="anonymous"></script>
 < script>
 window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
+gtag('js', new Date());""")
 if choice == "Upload":
     st.title("Upload Your Dataset")
     file = st.file_uploader("Upload Your Dataset")
