@@ -1019,7 +1019,7 @@ if choice == "Download":
                     data=data,
                     file_name="./" + i + ".pkl"
                 )
-        if st.button("Do Prediction",type="primary"):
+        if st.toggle("Do Prediction"):
             if "chosen_target" in st.session_state:
                 chosen_target = st.session_state['chosen_target']
                 cols = df.columns
@@ -1068,7 +1068,7 @@ if choice == "Download":
                     data=data,
                     file_name="./" + i + ".pkl"
                 )
-        if st.button("Do Classification",type="primary"):
+        if st.toggle("Do Classification"):
             if "chosen_target" in st.session_state:
                 chosen_target = st.session_state['chosen_target']
                 cols = df.columns
