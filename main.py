@@ -1,11 +1,10 @@
 import os
 import pickle
 import streamlit as st
-ad_sense_script = """
+ad_sense_script = ("""
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5056338602918094"
      crossorigin="anonymous"></script>
-"""
-
+""")
 st.markdown(ad_sense_script, unsafe_allow_html=True)
 import pandas as pd
 from ydata_profiling import ProfileReport
