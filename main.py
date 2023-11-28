@@ -6,18 +6,19 @@ from ydata_profiling import ProfileReport
 import streamlit.components.v1 as components
 from pivottablejs import pivot_ui
 import numpy as np
-# from scikitplot import metrics
+from scikitplot import metrics
 from scipy.stats import zscore
 import io
 import pygwalker as pyg
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA, LinearDiscriminantAnalysis
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.decomposition import PCA, TruncatedSVD
 from sklearn.manifold import TSNE, MDS, Isomap
+from sklearn.pipeline import make_pipeline
 from sklearn.metrics import mean_absolute_error, mean_squared_error, precision_score, recall_score, f1_score
 from sklearn.cluster import AffinityPropagation, AgglomerativeClustering, Birch, DBSCAN, KMeans, MiniBatchKMeans, \
     MeanShift, OPTICS, SpectralClustering
 from sklearn.compose import ColumnTransformer
-from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis, LinearDiscriminantAnalysis 
 from sklearn.gaussian_process import GaussianProcessClassifier, GaussianProcessRegressor
 from sklearn.linear_model import Lasso, LogisticRegression, Perceptron, RidgeClassifier, PassiveAggressiveClassifier, \
     ElasticNet
@@ -31,11 +32,11 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import PolynomialFeatures, OneHotEncoder, StandardScaler, MinMaxScaler
-from sklearn.pipeline import make_pipeline
 from sklearn.svm import SVR, SVC
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
 from streamlit_pandas_profiling import st_profile_report
 from PIL import Image
+
 
 if os.path.exists('./dataset.csv'):
     df = pd.read_csv('dataset.csv', index_col=None)
@@ -49,6 +50,7 @@ with st.sidebar:
     st.info("This project application helps you build and explore your data.")
 
 if choice == "Introduction":
+
     st.write("# Welcome to machine learning project platform! 👋")
     st.markdown("""
     At our website, we offer a comprehensive suite of tools and features to assist you in your data-driven projects. Whether you're a data enthusiast, a business analyst, or a machine learning practitioner, our platform is designed to streamline your workflow and help you make insightful decisions from your data.
@@ -101,17 +103,26 @@ if choice == "Introduction":
     Join us in exploring the power of data analysis and machine learning! Our platform is your gateway to uncovering hidden insights, making data-driven decisions, and bringing your projects to new heights. Let's embark on this exciting journey together!""")
 
 if choice == "Upload":
+    components.html("""
+                    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5056338602918094"
+     crossorigin="anonymous"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+                    """)
     st.title("Upload Your Dataset")
     file = st.file_uploader("Upload Your Dataset")
     if file:
         df = pd.read_csv(file, index_col=None)
         df.to_csv('dataset.csv', index=None)
         st.dataframe(df)
-        describe_table = df.describe()
-        minmax = {}
+        describe_table=df.describe()
+        minmax={}
         for i in describe_table:
-            minmax[i] = [describe_table[i]['min'], describe_table[i]['max']]
-        st.session_state['minmaxtable'] = minmax
+            minmax[i]=[describe_table[i]['min'],describe_table[i]['max']]
+        st.session_state['minmaxtable']=minmax
         columns = df.columns
         st.subheader("Shape and size of the data")
         if st.button("size"):
@@ -289,33 +300,33 @@ if choice == "Profiling":
             st.subheader("GO To Upload File")
 
 if choice == "Modelling":
-    snow = False
+    snow=False
     df_results = []
     if not os.path.exists('./data.csv'):
         st.subheader("Go To Upload File")
     else:
         df = pd.read_csv("./data.csv")
         df = df.iloc[:, 1:]
-        df_clone = df.iloc[:, 1:]
+        df_clone =  df. copy(deep=True)
         col1, col2 = st.columns(2, gap='medium')
         with col1:
             st.subheader("supervised machine learning")
             choice1 = st.selectbox("supervised", ["Regression", "Classification"])
             chosen_target = st.selectbox('Choose the Target Column', df.columns, index=len(df.columns) - 1)
-            st.session_state['chosen_target'] = chosen_target
+            st.session_state['chosen_target']=chosen_target
             target = st.slider('Test_Size', 0.01, 0.5)
             random_state = st.slider('Random_State', 0, 100)
             X = df.drop(columns=[chosen_target])
             y = df[chosen_target]
             x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=target, random_state=random_state)
             numerical_col = X.select_dtypes(include=np.number).columns
-            st.session_state['numerical_col_set'] = set(numerical_col)
+            st.session_state['numerical_col_set']=set(numerical_col)
             categorical_col = X.select_dtypes(exclude=np.number).columns
-            st.session_state['categorical_col_set'] = set(categorical_col)
+            st.session_state['categorical_col_set']=set(categorical_col)
             scaler = MinMaxScaler()
             ct_encoder = ColumnTransformer(transformers=[('encoder', OneHotEncoder(), categorical_col)],
                                            remainder='passthrough')
-            st.session_state['ct_encoder'] = ct_encoder
+            st.session_state['ct_encoder']=ct_encoder
             x_train_encoded = ct_encoder.fit_transform(x_train)
             x_test_encoded = ct_encoder.transform(x_test)
             x_train = scaler.fit_transform(x_train_encoded)
@@ -329,7 +340,6 @@ if choice == "Modelling":
                                              "Lasso Regression", "Gaussian Regression", "KNN Regression", "AdaBoost"])
 
                 if True:
-                    snow = True
                     table = {"Algorithm": [], "MAE": [], "RMSE": [], "R2 Score": []}
                     for algorithm in algorithms:
                         if algorithm == "Linear Regression":
@@ -480,24 +490,33 @@ if choice == "Modelling":
                             table["R2 Score"].append(r2score)
                             pickle.dump(reg, open('ABR.pkl', 'wb'))
                     if st.button('Run Modelling'):
+                        snow=True
                         df_results = pd.DataFrame(table)
 
             elif "Classification" in choice1:
                 label = {}
-                classes = {}
+                classes={}
                 v = 0
                 for i in y.unique():
                     label[i] = v
-                    classes[v] = i
+                    classes[v]=i
                     v += 1
-                st.session_state['classes'] = classes
+                st.session_state['classes']=classes
                 y_test = y_test.apply(lambda x: label[x])
                 y_train = y_train.apply(lambda x: label[x])
                 algorithms = st.multiselect("Classification Algorithms", ["Logistic Regression", "Decision Trees",
+                                                                          "Random Forest","Naive Bayes",
+                                                                          "Support Vector Machines (SVM)",
+                                                                          "Gradient Boosting","Neural Networks",
+                                                                          "Quadratic Discriminant Analysis (QDA)"
+                                                                          "Adaptive Boosting (AdaBoost)",
+                                                                          "Gaussian Processes","Perceptron",
+                                                                          "KNN Classifier","Ridge Classifier",
+                                                                          "Passive Aggressive Classifier",
                                                                           "Elastic Net", "Lasso Regression"])
 
                 if True:
-                    snow = True
+                    snow=True
                     table = {"Algorithm": [], "Precision": [], "Recall": [], "F1-Score": []}
                     for algorithm in algorithms:
                         if algorithm == "Logistic Regression":
@@ -774,6 +793,7 @@ if choice == "Modelling":
                             table["F1-Score"].append(f1)
                             pickle.dump(reg, open('LAR.pkl', 'wb'))
                     if st.button('Run Modelling'):
+                        snow=True
                         df_results = pd.DataFrame(table)
 
         with col2:
@@ -785,6 +805,7 @@ if choice == "Modelling":
             df = ct_encoder.fit_transform(df)
             choice1 = st.selectbox("Unsupervised", ["Clustering", "Dimensionality Reduction"])
             if "Clustering" in choice1:
+
                 algorithms = st.multiselect("Clustering Algorithms",
                                             ["Affinity Propagation", "Agglomerative Clustering",
                                              "BIRCH", "DBSCAN", "K-Means", "Mini-Batch K-Means",
@@ -792,16 +813,16 @@ if choice == "Modelling":
                                              "Gaussian Mixture Model"])
 
                 if st.button('Run Model'):
-                    snow = True
+                    snow=True
                     table = {"Algorithm": [], "Silhouette": []}
                     for algorithm in algorithms:
                         if algorithm == "Affinity Propagation":
                             clustering = AffinityPropagation()
                             clustering.fit(df)
                             labels = clustering.labels_
-                            uniq = len(np.unique(labels))
-                            if uniq == 1:
-                                st.warning("Improper Data for " + algorithm)
+                            uniq=len(np.unique(labels))
+                            if uniq==1:
+                                st.warning("Improper Data for "+algorithm)
                                 continue
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
@@ -812,9 +833,9 @@ if choice == "Modelling":
                             clustering = AgglomerativeClustering()
                             clustering.fit(df)
                             labels = clustering.labels_
-                            uniq = len(np.unique(labels))
-                            if uniq == 1:
-                                st.warning("Improper Data for " + algorithm)
+                            uniq=len(np.unique(labels))
+                            if uniq==1:
+                                st.warning("Improper Data for "+algorithm)
                                 continue
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
@@ -825,9 +846,9 @@ if choice == "Modelling":
                             clustering = Birch()
                             clustering.fit(df)
                             labels = clustering.labels_
-                            uniq = len(np.unique(labels))
-                            if uniq == 1:
-                                st.warning("Improper Data for " + algorithm)
+                            uniq=len(np.unique(labels))
+                            if uniq==1:
+                                st.warning("Improper Data for "+algorithm)
                                 continue
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
@@ -837,9 +858,9 @@ if choice == "Modelling":
                         elif algorithm == "DBSCAN":
                             clustering = DBSCAN()
                             labels = clustering.fit_predict(df)
-                            uniq = len(np.unique(labels))
-                            if uniq == 1:
-                                st.warning("Improper Data for " + algorithm)
+                            uniq=len(np.unique(labels))
+                            if uniq==1:
+                                st.warning("Improper Data for "+algorithm)
                                 continue
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
@@ -850,9 +871,9 @@ if choice == "Modelling":
                             clustering = KMeans()
                             clustering.fit(df)
                             labels = clustering.predict(df)
-                            uniq = len(np.unique(labels))
-                            if uniq == 1:
-                                st.warning("Improper Data for " + algorithm)
+                            uniq=len(np.unique(labels))
+                            if uniq==1:
+                                st.warning("Improper Data for "+algorithm)
                                 continue
                             silhouette_avg = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append("K-Means")
@@ -863,9 +884,9 @@ if choice == "Modelling":
                             clustering = MiniBatchKMeans()
                             clustering.fit(df)
                             labels = clustering.labels_
-                            uniq = len(np.unique(labels))
-                            if uniq == 1:
-                                st.warning("Improper Data for " + algorithm)
+                            uniq=len(np.unique(labels))
+                            if uniq==1:
+                                st.warning("Improper Data for "+algorithm)
                                 continue
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
@@ -875,9 +896,9 @@ if choice == "Modelling":
                         elif algorithm == "Mean Shift":
                             clustering = MeanShift()
                             labels = clustering.fit_predict(df)
-                            uniq = len(np.unique(labels))
-                            if uniq == 1:
-                                st.warning("Improper Data for " + algorithm)
+                            uniq=len(np.unique(labels))
+                            if uniq==1:
+                                st.warning("Improper Data for "+algorithm)
                                 continue
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
@@ -888,9 +909,9 @@ if choice == "Modelling":
                             clustering = OPTICS()
                             clustering.fit(df)
                             labels = clustering.labels_
-                            uniq = len(np.unique(labels))
-                            if uniq == 1:
-                                st.warning("Improper Data for " + algorithm)
+                            uniq=len(np.unique(labels))
+                            if uniq==1:
+                                st.warning("Improper Data for "+algorithm)
                                 continue
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
@@ -901,9 +922,9 @@ if choice == "Modelling":
                             clustering = SpectralClustering()
                             clustering.fit(df)
                             labels = clustering.labels_
-                            uniq = len(np.unique(labels))
-                            if uniq == 1:
-                                st.warning("Improper Data for " + algorithm)
+                            uniq=len(np.unique(labels))
+                            if uniq==1:
+                                st.warning("Improper Data for "+algorithm)
                                 continue
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
@@ -913,9 +934,9 @@ if choice == "Modelling":
                         elif algorithm == "Gaussian Mixture Model":
                             clustering = GaussianMixture(n_components=10)
                             labels = clustering.fit_predict(df)
-                            uniq = len(np.unique(labels))
-                            if uniq == 1:
-                                st.warning("Improper Data for " + algorithm)
+                            uniq=len(np.unique(labels))
+                            if uniq==1:
+                                st.warning("Improper Data for "+algorithm)
                                 continue
                             silhouette_score = metrics.silhouette_score(df, labels) * 100
                             table["Algorithm"].append(algorithm)
@@ -926,13 +947,11 @@ if choice == "Modelling":
             elif "Dimensionality Reduction" in choice1:
                 algorithms = st.selectbox("Dimensionality Reduction",
                                           ["PCA", "LDA", "Truncated SVD", "t-SNE", "MDS", "Isomap"])
-                scaler = StandardScaler()
-                X_train_std = scaler.fit_transform(x_train)
-                X_test_std = scaler.transform(x_test)
-
+                if algorithms =='LDA':
+                    chosen_target = st.selectbox('Choose the Target Column', df_clone.columns)
                 nc = st.slider("n_components", 1, df_clone.shape[1])
                 if st.button('Run Model'):
-                    snow = True
+                    snow=True
                     if algorithms == "PCA":
                         pca = PCA(n_components=nc)
                         data_pca = pca.fit_transform(df)
@@ -940,10 +959,22 @@ if choice == "Modelling":
                         df_results = pd.DataFrame(data_pca)
 
                     elif algorithms == "LDA":
-                        lda = LDA(n_components=2)
-                        data_lda = lda.fit_transform(X_train_std, y_train)
+                        lda = LinearDiscriminantAnalysis()
+                        X = df_clone.drop(columns=[chosen_target])
+                        y = df_clone[chosen_target]
+                        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+                        scaler = StandardScaler()
+                        X_train  = ct_encoder.fit_transform(X_train )
+                        X_test = ct_encoder.transform(X_test)
+                        X_train_std = scaler.fit_transform(X_train)
+                        X_test_std = scaler.transform(X_test)
+                        lda = LinearDiscriminantAnalysis(n_components=nc)
+                        X_train_lda = lda.fit_transform(X_train_std, y_train)
+                        X_test_lda = lda.transform(X_test_std)
+                        data_lda = lda.fit_transform(X, y)
                         st.write("LDA Results:")
                         df_results = pd.DataFrame(data_lda)
+
                     elif algorithms == "Truncated SVD":
                         svd = TruncatedSVD(n_components=nc)
                         data_svd = svd.fit_transform(df)
@@ -969,14 +1000,15 @@ if choice == "Modelling":
                         df_results = pd.DataFrame(data_isomap)
 
         st.write(df_results)
-        if snow:
+        if snow==True:
+            st.dataframe(df_results)
             st.snow()
 
 if choice == "Download":
     if not os.path.exists('./data.csv'):
         st.subheader("Go To Upload File")
     else:
-        df = df.iloc[:, :]
+        df = df.iloc[:,:]
         # st.dataframe(df.head(10))
         df.to_csv(r"DATA.csv")
         with open('DATA.csv', 'rb') as file:
@@ -1008,103 +1040,107 @@ if choice == "Download":
     choicel = st.selectbox("Model", ["Regression", "Classification", "Clustering"])
 
     if choicel == "Regression":
-        available_models = []
+        available_models=[]
         for i in reg_model:
             if os.path.exists("./" + i + ".pkl"):
                 with open(i + '.pkl', 'rb') as file:
-                    available_models.append([i, d[i]])
+                    available_models.append([i,d[i]])
                     data = file.read()
                 st.download_button(
                     label=d[i],
                     data=data,
                     file_name="./" + i + ".pkl"
                 )
-        if st.checkbox("Do Prediction"):
+        if st.toggle("Do Prediction"):
             if "chosen_target" in st.session_state:
-                chosen_target = st.session_state['chosen_target']
-                cols = df.columns
-                predict = []
-                minmax = {}
+                chosen_target=st.session_state['chosen_target']
+                cols=df.columns
+                predict=[]
+                minmax={}
                 for col in cols:
-                    if col == chosen_target:
+                    if col==chosen_target:
                         continue
                     if col in st.session_state['numerical_col_set']:
-                        mv = st.session_state['minmaxtable'][col]
-                        x = st.number_input(col, min_value=mv[0], max_value=mv[1])
-                        v = (x - mv[0]) / (mv[1] - mv[0])
-                        predict += [v]
+                        mv=st.session_state['minmaxtable'][col]
+                        x=st.number_input(col,min_value=mv[0],max_value=mv[1])
+                        v=(x-mv[0])/(mv[1]-mv[0])
+                        predict+=[v]
                     elif col in st.session_state['categorical_col_set']:
-                        uniquevals = df[col].unique()
-                        x = st.selectbox(col, uniquevals)
-                        v = []
+                        uniquevals=df[col].unique()
+                        x=st.selectbox(col,uniquevals)
+                        v=[]
                         for i in uniquevals:
-                            if i == x:
-                                v += [1]
+                            if i==x:
+                                v+=[1]
                             else:
-                                v += [0]
-                        predict += v
-
-                npredict = np.array(predict).reshape(1, -1)
-
-                model = st.selectbox("Select the model to predict", available_models)
-                st.write("Selected Model is ", model[1])
-                with open(model[0] + '.pkl', 'rb') as f:
+                                v+=[0]
+                        predict+=v
+                        
+                npredict=np.array(predict).reshape(1,-1)
+                
+                model=st.selectbox("Select the model to predict",available_models)
+                st.write("Selected Model is ",model[1])
+                with open(model[0]+'.pkl', 'rb') as f:
                     mod = pickle.load(f)
                 predictions = mod.predict(npredict)[0]
-                st.subheader("Classified value " + str(predictions))
+                # st.write(predictions,classes)
+                # st.write(predictions)
+                st.subheader("Predicted value "+str(predictions))
+                # st.subheader(f"predicted value {predictions:.7f}")
 
             else:
-                st.error("Select the chosen target in Modelling page", icon="🚨")
+                st.error("Select the chosen target in Modelling page",icon="🚨")
+
 
     if choicel == "Classification":
-        available_models = []
+        available_models=[]
         for i in cla_model:
             if os.path.exists("./" + i + ".pkl"):
                 with open(i + '.pkl', 'rb') as file:
-                    available_models.append([i, d[i]])
+                    available_models.append([i,d[i]])
                     data = file.read()
                 st.download_button(
                     label=d[i],
                     data=data,
                     file_name="./" + i + ".pkl"
                 )
-        if st.checkbox("Do Classification"):
+        if st.toggle("Do Classification"):
             if "chosen_target" in st.session_state:
-                chosen_target = st.session_state['chosen_target']
-                cols = df.columns
-                predict = []
-                minmax = {}
+                chosen_target=st.session_state['chosen_target']
+                cols=df.columns
+                predict=[]
+                minmax={}
                 for col in cols:
-                    if col == chosen_target:
+                    if col==chosen_target:
                         continue
                     if col in st.session_state['numerical_col_set']:
-                        mv = st.session_state['minmaxtable'][col]
-                        x = st.number_input(col, min_value=mv[0], max_value=mv[1])
-                        v = (x - mv[0]) / (mv[1] - mv[0])
-                        predict += [v]
+                        mv=st.session_state['minmaxtable'][col]
+                        x=st.number_input(col,min_value=mv[0],max_value=mv[1])
+                        v=(x-mv[0])/(mv[1]-mv[0])
+                        predict+=[v]
                     elif col in st.session_state['categorical_col_set']:
-                        uniquevals = df[col].unique()
-                        x = st.selectbox(col, uniquevals)
-                        v = []
+                        uniquevals=df[col].unique()
+                        x=st.selectbox(col,uniquevals)
+                        v=[]
                         for i in uniquevals:
-                            if i == x:
-                                v += [1]
+                            if i==x:
+                                v+=[1]
                             else:
-                                v += [0]
-                        predict += v
-                npredict = np.array(predict).reshape(1, -1)
+                                v+=[0]
+                        predict+=v
+                npredict=np.array(predict).reshape(1,-1)
                 # st.write(predict)
-                model = st.selectbox("Select the model to classify", available_models)
-                st.write("Selected Model is ", model[1])
-                with open(model[0] + '.pkl', 'rb') as f:
+                model=st.selectbox("Select the model to classify",available_models)
+                st.write("Selected Model is ",model[1])
+                with open(model[0]+'.pkl', 'rb') as f:
                     mod = pickle.load(f)
                 predictions = int(mod.predict(npredict)[0])
-                classes = st.session_state['classes']
+                classes=st.session_state['classes']
                 # st.write(predictions,classes)
-                st.subheader("predicted Class " + classes[predictions])
+                st.subheader("predicted Class "+classes[predictions])
 
             else:
-                st.error("Select the chosen target in Modelling page", icon="🚨")
+                st.error("Select the chosen target in Modelling page",icon="🚨")
 
     if choicel == "Clustering":
         for i in clu_model:
