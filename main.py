@@ -1,6 +1,12 @@
 import os
 import pickle
 import streamlit as st
+ad_sense_script = """
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5056338602918094"
+     crossorigin="anonymous"></script>
+"""
+
+st.markdown(ad_sense_script, unsafe_allow_html=True)
 import pandas as pd
 from ydata_profiling import ProfileReport
 import streamlit.components.v1 as components
@@ -48,12 +54,7 @@ with st.sidebar:
                        "Download"])
     st.info("This project application helps you build and explore your data.")
 
-    components.html("""
-    <script async <!-- Global site tag (gtag.js) Google Analytics -->
-    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5056338602918094" crossorigin="anonymous"></script>
-    < script>
-    window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());""")
+  
 if choice == "Introduction":
     st.write("# Welcome to machine learning project platform! 👋")
     st.markdown("""
