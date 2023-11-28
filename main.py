@@ -350,7 +350,7 @@ if choice == "Modelling":
                             degree = st.slider("Polynomial Degree", 2, 10, 2)
                             reg = make_pipeline(PolynomialFeatures(degree=degree), LinearRegression())
                             reg.fit(x_train, y_train)
-                            y_pred=reg.predict(x_test)
+                            y_pred = reg.predict(x_test)
                             mse = np.sqrt(mean_squared_error(y_test, y_pred))
                             mae = mean_absolute_error(y_test, y_pred)
                             r2score = r2_score(y_test, y_pred) * 100
@@ -926,6 +926,10 @@ if choice == "Modelling":
             elif "Dimensionality Reduction" in choice1:
                 algorithms = st.selectbox("Dimensionality Reduction",
                                           ["PCA", "LDA", "Truncated SVD", "t-SNE", "MDS", "Isomap"])
+                scaler = StandardScaler()
+                X_train_std = scaler.fit_transform(x_train)
+                X_test_std = scaler.transform(x_test)
+
                 nc = st.slider("n_components", 1, df_clone.shape[1])
                 if st.button('Run Model'):
                     snow = True
@@ -936,22 +940,10 @@ if choice == "Modelling":
                         df_results = pd.DataFrame(data_pca)
 
                     elif algorithms == "LDA":
-                        lda=LinearDiscriminantAnalysis()
-                        X = df_clone.drop(columns=[chosen_target])
-                        y = df_clone[chosen_target]
-                        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-                        scaler = StandardScaler()
-                        X_train = ct_encoder.fit_transform(X_train)
-                        X_test = ct_encoder.transform(X_test)
-                        X_train_std = scaler.fit_transform(X_train)
-                        X_test_std = scaler.transform(X_test)
-                        lda=LinearDiscriminantAnalysis(n_components=nc)
-                        X_train_lda = lda.fit_transform(X_train_std, y_train)
-                        X_test_lda = lda.transform(X_test_std)
-                        data_lda = lda.fit_transform(X, y)
+                        lda = LDA(n_components=2)
+                        data_lda = lda.fit_transform(X_train_std, y_train)
                         st.write("LDA Results:")
                         df_results = pd.DataFrame(data_lda)
-
                     elif algorithms == "Truncated SVD":
                         svd = TruncatedSVD(n_components=nc)
                         data_svd = svd.fit_transform(df)
