@@ -100,12 +100,6 @@ if choice == "Introduction":
     st.markdown("""
     Join us in exploring the power of data analysis and machine learning! Our platform is your gateway to uncovering hidden insights, making data-driven decisions, and bringing your projects to new heights. Let's embark on this exciting journey together!""")
 if choice == "Upload":
-    components.html("""
-<script async <!-- Global site tag (gtag.js) Google Analytics -->
-src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5056338602918094" crossorigin="anonymous"></script>
-<script>
-window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());""")
     st.title("Upload Your Dataset")
     file = st.file_uploader("Upload Your Dataset")
     if file:
@@ -264,7 +258,7 @@ if choice == "Data visualization":
         st.title("Data visualization")
         t = pivot_ui(df)
         with open(t.src) as t:
-            components.html(t.read(), width=900, height=1000, scrolling=True)
+            components.html(t.read(), width=1200, height=1200, scrolling=True)
         pyg_html = pyg.to_html(df)
         components.html(pyg_html, height=1000, scrolling=True)
     else:
@@ -274,7 +268,7 @@ if choice == "Data visualization":
             st.title("Pivot Table")
             t = pivot_ui(df)
             with open(t.src) as t:
-                components.html(t.read(), width=900, height=1000, scrolling=True)
+                components.html(t.read(), width=1200, height=1200, scrolling=True)
         else:
             st.subheader("GO To Upload File")
 
@@ -1060,7 +1054,7 @@ if choice == "Download":
                 with open(model[0] + '.pkl', 'rb') as f:
                     mod = pickle.load(f)
                 predictions = mod.predict(npredict)[0]
-                st.subheader("Classified value " + str(predictions))
+                st.subheader("predicted Class " + str(predictions))
 
             else:
                 st.error("Select the chosen target in Modelling page", icon="🚨")
