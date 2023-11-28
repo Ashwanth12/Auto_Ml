@@ -147,7 +147,7 @@ if choice == "Upload":
 
 if choice == "Cleaning":
     if not os.path.exists('./dataset.csv'):
-        st.subheader("Go To Upload File")
+        st.subheader("Go To Upload Page")
     else:
         remove_cols = st.multiselect("Do you want to remove any columns", df.columns)
         ava_col = []
@@ -270,9 +270,9 @@ if choice == "Data visualization":
         st.title("Data visualization")
         t = pivot_ui(df)
         with open(t.src) as t:
-            components.html(t.read(), width=900, height=1000, scrolling=True)
+            components.html(t.read(), width=1000, height=1000, scrolling=True)
         pyg_html = pyg.to_html(df)
-        components.html(pyg_html, height=1000, scrolling=True)
+        components.html(pyg_html, height=1200,width=1200, scrolling=True)
     else:
         if os.path.exists('./dataset.csv'):
             # df = pd.read_csv("./dataset.csv")
@@ -280,9 +280,9 @@ if choice == "Data visualization":
             st.title("Pivot Table")
             t = pivot_ui(df)
             with open(t.src) as t:
-                components.html(t.read(), width=900, height=1000, scrolling=True)
+                components.html(t.read(), width=1200, height=1200, scrolling=True)
         else:
-            st.subheader("GO To Upload File")
+            st.subheader("GO To Upload Page")
 
 if choice == "Profiling":
     if os.path.exists('./data.csv'):
@@ -297,7 +297,7 @@ if choice == "Profiling":
             profile = ProfileReport(df)
             st_profile_report(profile)
         else:
-            st.subheader("GO To Upload File")
+            st.subheader("GO To Upload Page")
 
 if choice == "Modelling":
     snow=False
