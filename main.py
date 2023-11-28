@@ -48,6 +48,12 @@ with st.sidebar:
                        "Download"])
     st.info("This project application helps you build and explore your data.")
 
+components.html("""
+<script async <!-- Global site tag (gtag.js) Google Analytics -->
+src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5056338602918094" crossorigin="anonymous"></script>
+< script>
+window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());""")
 if choice == "Introduction":
     st.write("# Welcome to machine learning project platform! 👋")
     st.markdown("""
