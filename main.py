@@ -106,10 +106,6 @@ if choice == "Introduction":
     st.markdown("""
     Join us in exploring the power of data analysis and machine learning! Our platform is your gateway to uncovering hidden insights, making data-driven decisions, and bringing your projects to new heights. Let's embark on this exciting journey together!""")
 if choice == "Upload":
-     ad_sense_script = """
-     <head><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4093751964160592"
-          crossorigin="anonymous"></script>
-     </head>"""
     st.title("Upload Your Dataset")
     file = st.file_uploader("Upload Your Dataset")
     if file:
@@ -144,10 +140,6 @@ if choice == "Upload":
             st.dataframe(df.isnull().sum())
 
 if choice == "Cleaning":
-     ad_sense_script = """
-     <head><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4093751964160592"
-          crossorigin="anonymous"></script>
-     </head>"""
     if not os.path.exists('./dataset.csv'):
         st.subheader("Go To Upload File")
     else:
@@ -266,10 +258,6 @@ if choice == "Cleaning":
         df.to_csv("data.csv")
 
 if choice == "Data visualization":
-    ad_sense_script = """
-     <head><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4093751964160592"
-          crossorigin="anonymous"></script>
-     </head>"""
     if os.path.exists('./data.csv'):
         df = pd.read_csv("./data.csv")
         df = df.iloc[:, 1:]
@@ -291,10 +279,6 @@ if choice == "Data visualization":
             st.subheader("GO To Upload File")
 
 if choice == "Profiling":
-    ad_sense_script = """
-     <head><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4093751964160592"
-          crossorigin="anonymous"></script>
-     </head>"""
     if os.path.exists('./data.csv'):
         df = pd.read_csv("./data.csv")
         df = df.iloc[:, 1:]
@@ -310,10 +294,6 @@ if choice == "Profiling":
             st.subheader("GO To Upload File")
 
 if choice == "Modelling":
-    ad_sense_script = """
-     <head><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4093751964160592"
-          crossorigin="anonymous"></script>
-     </head>"""
     snow = False
     df_results = []
     if not os.path.exists('./data.csv'):
