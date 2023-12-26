@@ -6,7 +6,7 @@ from ydata_profiling import ProfileReport
 import streamlit.components.v1 as components
 from pivottablejs import pivot_ui
 import numpy as np
-
+from scikitplot import metrics
 from scipy.stats import zscore
 import io
 import pygwalker as pyg
