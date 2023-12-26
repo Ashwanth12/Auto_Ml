@@ -6,7 +6,7 @@ from ydata_profiling import ProfileReport
 import streamlit.components.v1 as components
 from pivottablejs import pivot_ui
 import numpy as np
-# from scikitplot import metrics
+from scikitplot import metrics
 from scipy.stats import zscore
 import io
 import pygwalker as pyg
@@ -48,7 +48,6 @@ with st.sidebar:
                        "Download"])
     st.info("This project application helps you build and explore your data.")
 
-  
 if choice == "Introduction":
     st.write("# Welcome to machine learning project platform! 👋")
     st.markdown("""
@@ -100,6 +99,7 @@ if choice == "Introduction":
     st.image(Image.open("images/download.png"))
     st.markdown("""
     Join us in exploring the power of data analysis and machine learning! Our platform is your gateway to uncovering hidden insights, making data-driven decisions, and bringing your projects to new heights. Let's embark on this exciting journey together!""")
+
 if choice == "Upload":
     st.title("Upload Your Dataset")
     file = st.file_uploader("Upload Your Dataset")
@@ -108,9 +108,10 @@ if choice == "Upload":
         df.to_csv('dataset.csv', index=None)
         st.dataframe(df)
         describe_table = df.describe()
-        minmax = {}
-        for i in describe_table:
-            minmax[i] = [describe_table[i]['min'], describe_table[i]['max']]
+        if len(describe_table)>0:
+            minmax = {}
+            for i in describe_table:
+                minmax[i] = [describe_table[i]['min'], describe_table[i]['max']]
         st.session_state['minmaxtable'] = minmax
         columns = df.columns
         st.subheader("Shape and size of the data")
@@ -259,7 +260,7 @@ if choice == "Data visualization":
         st.title("Data visualization")
         t = pivot_ui(df)
         with open(t.src) as t:
-            components.html(t.read(), width=1200, height=1200, scrolling=True)
+            components.html(t.read(), width=900, height=1000, scrolling=True)
         pyg_html = pyg.to_html(df)
         components.html(pyg_html, height=1000, scrolling=True)
     else:
@@ -269,7 +270,7 @@ if choice == "Data visualization":
             st.title("Pivot Table")
             t = pivot_ui(df)
             with open(t.src) as t:
-                components.html(t.read(), width=1200, height=1200, scrolling=True)
+                components.html(t.read(), width=900, height=1000, scrolling=True)
         else:
             st.subheader("GO To Upload File")
 
@@ -495,11 +496,12 @@ if choice == "Modelling":
                 y_train = y_train.apply(lambda x: label[x])
 
                 algorithms = st.multiselect(
-                    "Classification Algorithms", ["Logistic Regression", "Decision Trees", "Random Forest", "Naive Bayes",
-                                                   "Support Vector Machines (SVM)", "Gradient Boosting", "Neural Networks",
-                                                   "Quadratic Discriminant Analysis (QDA)", "Adaptive Boosting (AdaBoost)",
-                                                   "Gaussian Processes", "Perceptron", "KNN Classifier", "Ridge Classifier",
-                                                   "Passive Aggressive Classifier", "Elastic Net", "Lasso Regression"])
+                    "Classification Algorithms",
+                    ["Logistic Regression", "Decision Trees", "Random Forest", "Naive Bayes",
+                     "Support Vector Machines (SVM)", "Gradient Boosting", "Neural Networks",
+                     "Quadratic Discriminant Analysis (QDA)", "Adaptive Boosting (AdaBoost)",
+                     "Gaussian Processes", "Perceptron", "KNN Classifier", "Ridge Classifier",
+                     "Passive Aggressive Classifier", "Elastic Net", "Lasso Regression"])
                 if True:
                     snow = True
                     table = {"Algorithm": [], "Precision": [], "Recall": [], "F1-Score": []}
@@ -1055,7 +1057,7 @@ if choice == "Download":
                 with open(model[0] + '.pkl', 'rb') as f:
                     mod = pickle.load(f)
                 predictions = mod.predict(npredict)[0]
-                st.subheader("predicted Class " + str(predictions))
+                st.subheader("Classified value " + str(predictions))
 
             else:
                 st.error("Select the chosen target in Modelling page", icon="🚨")
