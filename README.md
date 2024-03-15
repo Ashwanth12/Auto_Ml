@@ -3,7 +3,7 @@
 Hi, Thanks for your interest.
 
 # Introduction:
-Thank you for your interest in Auto ML! This project aims to automate the entire process of Machine Learning, making it accessible to users who may find coding challenging. Auto ML streamlines the process into 6 key steps, from data uploading to model deployment and prediction.
+ This project aims to automate the entire process of Machine Learning, making it accessible to users who may find coding challenging. Auto ML streamlines the process into 6 key steps, from data uploading to model deployment and prediction.
 
 # Steps:
 
