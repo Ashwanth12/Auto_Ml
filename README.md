@@ -33,11 +33,16 @@ Allows prediction and classification for new data points using selected algorith
 
 ### _Steps to Execute:_
 
-1 Visit the web application at the following link: Auto ML Web Application.
+1 Visit the web application at the following link:  https://automl-77tgcts4pkqowntarw5tbg.streamlit.app/
+
 2 Choose the dataset file in either .xlsx or .csv format.
+
 3 Upload the dataset and configure parameters as per your requirements.
+
 4 The system will process the data in the background using Machine Learning algorithms.
+
 5 Follow on-screen instructions to navigate through the various steps of the Auto ML process.
+
 
 ### Clone the Project:
 
