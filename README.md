@@ -2,13 +2,63 @@
 
 Hi, Thanks for your interest.
 
-This project is used for making Total process of machine Learning automated as many people difficult to write code. The project consists of 6 steps. Data Uploading, In Data Uploading users are provided with an interactive interface where the user needs to upload their dataset in the form of csv files. There the interface shows all the details of data like dataset, shape, size, information like data types of columns, description like mean, median, min, max of numeric columns. It also shows the data of missing values and number of duplicate rows. Data Cleaning, in data cleaning part users can remove unwanted columns, fill missing values like with mean, median or constant for numeric values mode, constant for categoric values remove duplicates. Users can do trimming and capping of outliers using Z-score, IQR, Percentile methods. Profiling, in profiling it gives a report of the data which shows some basic visualization and distribution of columns and it shows some basics insights of data. Data Visualization, in data visualization there is a tableau like interface where the user can explore data in form of visualization and get some meaningful insights. Data Modelling, In Data Modelling there is Supervised Machine Learning and Unsupervised Machine Learning. In Supervised Machine Learning user need to select the problem type like regression or classification then select the target   column then select the algorithms need to be train on data like for regression linear regression, polynomial regression, KNN Regression, Decision Tree, Random Forest, Naive Bayes etc for classification Logistic regression, KNN Regression, Decision Tree, Random Forest, Naive Bayes, Support Vector Machine, Ada Boost etc. After clicking on run all the model selected are trained the a table shows the data of algorithm names , Mean Square error , Mean Absolute error and R2 Score for regression Algorithm name , precision , recall , F1 score .In Unsupervised Machine Learning user need to select the problem type like clustering or dimension reduction then select the algorithm for clustering like DBSCAN , K-Means , mini batch K-means, Spectral Clustering etc for dimension reduction Principle component analysis, Linear discriminant analysis etc after clicking the run button for clustering the table with algorithms and silhouette score for Dimension reduction the reduced data is showed . Finally Download, in download the cleaned or reduced data can be downloaded and all the models can be downloaded in the form of pickle files even can do prediction and classification for the new data point for selected algorithm.
+# Introduction:
+Thank you for your interest in Auto ML! This project aims to automate the entire process of Machine Learning, making it accessible to users who may find coding challenging. Auto ML streamlines the process into 6 key steps, from data uploading to model deployment and prediction.
 
-### _Steps_ 
+# Steps:
 
-- First User has to visit the web application
-- Choose the dataset(*.xlsx or .csv) file
-- Choose the upload option and update the parameters as per requirement
-- It will processed in background through the ML Algorithm.
-### _website link_
-https://automl-77tgcts4pkqowntarw5tbg.streamlit.app/
+### Data Uploading:
+
+Users are presented with an interactive interface to upload their dataset in CSV format.
+The interface displays comprehensive details about the uploaded data, including dataset overview, shape, size, data types, descriptive statistics (mean, median, min, max), missing values, and duplicate rows.
+### Data Cleaning:
+
+Users can perform data cleaning tasks such as removing unwanted columns, filling missing values (with mean, median, or constant), removing duplicates, and outlier detection and treatment using methods like Z-score, IQR, and Percentile.
+### Profiling:
+
+Generates a report providing insights into the data, including basic visualizations, and distributions of columns.
+### Data Visualization:
+
+Offers a Tableau-like interface for exploring data through visualizations, enabling users to derive meaningful insights.
+### Data Modeling:
+
+Supervised Machine Learning: Users select problem type (regression or classification), target column, and algorithms to train on data.
+Algorithms available for regression include linear regression, polynomial regression, KNN Regression, Decision Tree, Random Forest, Naive Bayes, etc.
+Algorithms available for classification include Logistic regression, KNN Regression, Decision Tree, Random Forest, Naive Bayes, Support Vector Machine, Ada Boost, etc.
+Provides evaluation metrics such as Mean Square Error, Mean Absolute Error, R2 Score for regression, and precision, recall, F1 score for classification.
+### Download:
+
+Enables users to download cleaned or reduced data and trained models in the form of pickle files.
+Allows prediction and classification for new data points using selected algorithms.
+
+### _Steps to Execute:_
+
+1 Visit the web application at the following link: Auto ML Web Application.
+2 Choose the dataset file in either .xlsx or .csv format.
+3 Upload the dataset and configure parameters as per your requirements.
+4 The system will process the data in the background using Machine Learning algorithms.
+5 Follow on-screen instructions to navigate through the various steps of the Auto ML process.
+
+### Clone the Project:
+
+To clone the project and run it locally, follow these steps:
+
+1.Clone the repository from GitHub  :
+    git clone <repository_url>
+```bash
+ git clone <repository_url>
+```
+2.Navigate to the project directory:
+```bash
+    cd Auto-ML
+```
+ 
+3.Install dependencies:
+  ```bash
+    pip install -r requirements.txt
+```  
+4.Run the application:
+```bash
+    streamlit run main.py
+```
+    
